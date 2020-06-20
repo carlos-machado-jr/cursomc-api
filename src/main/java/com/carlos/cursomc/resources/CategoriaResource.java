@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.carlos.cursomc.domain.Categoria;
 import com.carlos.cursomc.services.CategoriaService;
 
+
 @RestController
 @RequestMapping("/categorias")
 public class CategoriaResource {
@@ -25,7 +26,7 @@ public class CategoriaResource {
 	
 		
 	@GetMapping("/{id}")
-	public ResponseEntity<Categoria> listarPorId(@PathVariable Integer id) {
+	public ResponseEntity<Categoria> listarPorId(@PathVariable Integer id)  {
 		
 		Categoria c = service.buscar(id);
 		return ResponseEntity.ok(c); 
