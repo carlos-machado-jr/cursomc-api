@@ -1,5 +1,6 @@
 package com.carlos.cursomc.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,21 +20,34 @@ public class CategoriaService {
 	@Autowired
 	CategoriaRepository repo;
 	
+	
+	
+	public List<Categoria> findAll(){
+		return repo.findAll();
+	}
+	
+	
 	public Categoria find(Integer id)  {
 		Optional<Categoria> c = repo.findById(id);
 		return c.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto nao encontrado! Id: " + id + ", Tipo: " + Categoria.class.getName())); 
 	}
 	
+	
+	
 	public Categoria insert(Categoria obj) {
 		obj.setId(null);
 		return repo.save(obj);
 	}
 	
+	
+	
 	public Categoria update(Categoria obj) {
 		find(obj.getId());
 		return repo.save(obj);
 	}
+	
+	
 	
 	public void delete(Integer id) {
 		find(id);
