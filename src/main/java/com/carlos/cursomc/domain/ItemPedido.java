@@ -46,6 +46,8 @@ public class ItemPedido implements Serializable{
 	public Produto getProduto() {
 		return id.getProduto();
 	}
+	
+	
 	public ItemPedidoPK getId() {
 		return id;
 	}
