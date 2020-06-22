@@ -72,6 +72,14 @@ public class Pedido implements Serializable {
 	
 	
 //	METODO GET E SET
+	
+	public Double getValorTotal() {
+		Double soma = 0.00;
+		for(ItemPedido ip : itens) {
+			soma = ip.getSubTotal() + soma;
+		}
+		return soma;
+	}
 	public Set<ItemPedido> getItens() {
 		return itens;
 	}
