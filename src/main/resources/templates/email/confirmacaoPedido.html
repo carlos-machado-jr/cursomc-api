@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:remove="all">Order Confirmation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body style="margin:0;">
+	<div style="background-color:red; padding:10px;border-radius: 23px;">
+	
+		<center><h1>Curso Spring Boot</h1></center>
+		<hr style="border-color:#797474; width:50%;">
+		<h2>
+			Pedido número: <span th:text="${pedido.id}"> </span>
+		</h2>
+		<p>
+			Instante: <span
+				th:text="${#dates.format(pedido.instante, 'dd/MM/yyyy hh:mm')}"></span>
+		</p>
+		<p>
+			Cliente: <span th:text="${pedido.cliente.nome}"></span>
+		</p>
+		<p>
+			Situação do pagamento: <span
+				th:text="${pedido.pagamento.estadoPagamento.descricao}"></span>
+		</p>
+		<h4>Detalhes do pedido:</h4>
+		<table border="1px" cellpadding="5px" cellspacing="0" ID="alter">
+			<tr>
+				<th>Produto</th>
+				<th>Quantidade</th>
+				<th>Preço unitário</th>
+				<th>Subtotal</th>
+			</tr>
+			<tr th:each="item : ${pedido.itens}">
+				<td th:text="${item.produto.nome}">nome</td>
+				<td th:text="${item.quantidade}">quantidade</td>
+				<td
+					th:text="${#numbers.formatDecimal(item.preco, 0, 'POINT', 2,
+'COMMA')}">preco</td>
+				<td
+					th:text="${#numbers.formatDecimal(item.subTotal, 0, 'POINT', 2,
+'COMMA')}">subTotal</td>
+			</tr>
+		</table>
+		<p>
+			Valor total: <span
+				th:text="${#numbers.formatDecimal(pedido.valorTotal, 0,
+'POINT', 2, 'COMMA')}"></span>
+		</p>
+	</div>
+</body>
+</html>
