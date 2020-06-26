@@ -1,5 +1,6 @@
 package com.carlos.cursomc.services;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.carlos.cursomc.domain.Cidade;
 import com.carlos.cursomc.domain.Cliente;
@@ -31,28 +33,38 @@ public class ClienteService {
 
 	@Autowired
 	ClienteRepository repo;
-	
+
 	@Autowired
 	private BCryptPasswordEncoder pe;
-	
+
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+
+	@Autowired
+	private S3Service s3Service;
+
 	
+
+//	@Value("${img.prefix.client.profile}")
+//	private String prefix;
+//
+//	@Value("${img.profile.size}")
+//	private Integer size;
+
 	public List<Cliente> findAll() {
 		return repo.findAll();
 	}
 
 	public Cliente find(Integer id) {
 		UserSS user = UserService.authenticated();
-		if(user == null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+		if (user == null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
 			throw new AuthorizationException("Acesso negado");
 		}
 		Optional<Cliente> c = repo.findById(id);
 		return c.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto nao encontrado! Id: " + id + ", Tipo: " + Cliente.class.getName()));
 	}
-	
-	
+
 	@Transactional
 	public Cliente insert(Cliente obj) {
 		obj.setId(null);
@@ -88,17 +100,19 @@ public class ClienteService {
 	public Cliente fromDTO(ClienteDTO obj) {
 		return new Cliente(obj.getId(), obj.getNome(), obj.getEmail(), null, null, null);
 	}
-	
+
 	public Cliente fromDTO(ClienteNewDTO obj) {
-		Cliente cli = new Cliente(null, obj.getNome(), obj.getEmail(), obj.getCpfOuCnpj(), TipoCliente.toEnum(obj.getTipo() ), pe.encode(obj.getSenha()));
+		Cliente cli = new Cliente(null, obj.getNome(), obj.getEmail(), obj.getCpfOuCnpj(),
+				TipoCliente.toEnum(obj.getTipo()), pe.encode(obj.getSenha()));
 		Cidade cid = new Cidade(obj.getCidadeId(), null, null);
-		Endereco end = new Endereco(null, obj.getLogradouro(), obj.getNumero(), obj.getComplemento(), cid, obj.getBairro(), obj.getCep(), cli);
+		Endereco end = new Endereco(null, obj.getLogradouro(), obj.getNumero(), obj.getComplemento(), cid,
+				obj.getBairro(), obj.getCep(), cli);
 		cli.getEnderecos().add(end);
 		cli.getTelefones().add(obj.getTelefone1());
-		if (obj.getTelefone2()!=null) {
+		if (obj.getTelefone2() != null) {
 			cli.getTelefones().add(obj.getTelefone2());
 		}
-		if (obj.getTelefone3()!=null) {
+		if (obj.getTelefone3() != null) {
 			cli.getTelefones().add(obj.getTelefone3());
 		}
 		return cli;
@@ -108,5 +122,20 @@ public class ClienteService {
 		newObj.setNome(obj.getNome());
 		newObj.setEmail(obj.getEmail());
 
+	}
+
+	public URI uploadProfilePicture(MultipartFile multipartFile) {
+//		UserSS user = UserService.authenticated();
+//		if (user == null) {
+//			throw new AuthorizationException("Acesso negado");
+//		}
+//
+//		BufferedImage jpgImage = imageService.getJpgImageFromFile(multipartFile);
+//		jpgImage = imageService.cropSquare(jpgImage);
+//		jpgImage = imageService.resize(jpgImage, size);
+//
+//		String fileName = prefix + user.getId() + ".jpg";
+//		imageService.getInputStream(jpgImage, "jpg"), fileName, "image"
+		return s3Service.uploadFile(multipartFile);
 	}
 }
